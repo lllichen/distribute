@@ -41,9 +41,8 @@ public class Master implements Watcher{
     public void process(WatchedEvent event) {
         System.out.println(event);
     }
-    static Random random = new Random( );
 
-    static String serviceId = Integer.toHexString( random.nextInt() );
+    static String serviceId = Integer.toHexString( new Random( ).nextInt() );
 
 
     static boolean isLeader ;
@@ -67,6 +66,7 @@ public class Master implements Watcher{
 
 
     DataCallback masterCheckCallback = new DataCallback() {
+
         @Override
         public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
             switch (Code.get( rc )) {
@@ -86,6 +86,7 @@ public class Master implements Watcher{
     }
 
     void runForMaster() {
+        LOG.info( serviceId );
         zk.create( "/master", serviceId.getBytes(),OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL ,masterCreateCallback, null);
     }
 
@@ -104,6 +105,8 @@ public class Master implements Watcher{
     StringCallback createParentCallback = new StringCallback() {
         @Override
         public void processResult(int rc, String path, Object ctx, String name) {
+            LOG.info("name is : ",name );
+
             switch (Code.get( rc )) {
                 case CONNECTIONLOSS:
                     createParent( path,(byte[]) ctx );
@@ -114,8 +117,8 @@ public class Master implements Watcher{
                 case NODEEXISTS:
                     LOG.warn( "Parent already registered: " + path );
                     break;
-                    default:
-                        LOG.error( "Something went wrong: ", KeeperException.create( Code.get( rc ),path ) );
+                default:
+                    LOG.error( "Something went wrong: ", KeeperException.create( Code.get( rc ),path ) );
             }
         }
     };
@@ -123,6 +126,7 @@ public class Master implements Watcher{
     public static void main(String[] args) throws Exception {
         Master m = new Master( args[0] );
         m.startZK();
+        m.bootstrap();
         m.runForMaster();
 
         if(isLeader){

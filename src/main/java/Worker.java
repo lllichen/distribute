@@ -8,6 +8,7 @@ import java.util.Random;
 
 import static org.apache.zookeeper.AsyncCallback.*;
 import static org.apache.zookeeper.KeeperException.*;
+import static org.apache.zookeeper.ZooDefs.*;
 
 /**
  * Created by lichen@daojia.com on 2018-5-17.
@@ -38,7 +39,7 @@ public class Worker implements Watcher{
     }
 
     void register() {
-        zk.create( "/workers/worker-"+serviceId,"Idle".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL,createWorkerCallback, null );
+        zk.create( "/workers/worker-"+serviceId,"Idle".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL,createWorkerCallback, null );
     }
 
     StringCallback createWorkerCallback = new StringCallback() {
