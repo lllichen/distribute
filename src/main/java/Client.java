@@ -1,5 +1,6 @@
 import org.apache.zookeeper.*;
 
+import static org.apache.zookeeper.KeeperException.*;
 import static org.apache.zookeeper.ZooDefs.Ids.OPEN_ACL_UNSAFE;
 
 /**
@@ -24,9 +25,9 @@ public class Client implements Watcher{
             try {
                 String name = zk.create( "/task/task-", command.getBytes(),OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL );
                 return name;
-            }catch (KeeperException.NodeExistsException e){
+            }catch (NodeExistsException e){
                 throw new Exception( name + " already appears to running" );
-            }catch (KeeperException.ConnectionLossException e){
+            }catch (ConnectionLossException e){
 
             }
         }

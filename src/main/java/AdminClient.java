@@ -6,6 +6,8 @@ import org.apache.zookeeper.data.Stat;
 
 import java.util.Date;
 
+import static org.apache.zookeeper.KeeperException.*;
+
 /**
  * Created by lichen@daojia.com on 2018-5-17.
  */
@@ -29,13 +31,12 @@ public class AdminClient implements Watcher{
             byte masterData[] = zk.getData( "/master",false,stat );
             Date startDate = new Date( stat.getCtime() );
             System.out.println("Master:" + new String(masterData) + " since "+ startDate );
-        }catch (KeeperException.NoNodeException e) {
+        }catch (NoNodeException e) {
             System.out.println("No Master");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
+
         System.out.println("Workers:");
-        for (String w : zk.getChildren( "/workers/",false )) {
+        for (String w : zk.getChildren( "/workers",false )) {
             byte data[] = zk.getData( "/workers/"+w,false,null );
 
             String state = new String( data );
